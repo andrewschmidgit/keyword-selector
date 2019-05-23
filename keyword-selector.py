@@ -22,8 +22,15 @@ def readFile(filename):
         return None
 
 def wordIsValid(word, rx, bannedWords):
-    if rx.search(word) or word in bannedWords:
+    if rx.search(word):
         return False
+    
+    for w in bannedWords:
+        if w == word or w + 's' == word or w + 'ed' == word:
+            return False
+        elif w.endswith('e') and (w[:-1] + 'ing' == word or w + 'd' == word):
+            return False
+
     return True
 
 def formatWords(words):
@@ -41,7 +48,7 @@ words = readFile(args.filename)
 wordCount = Counter(words)
 
 rx = re.compile(r'^([0-9]+|[a-zA-Z]{1,2})$')
-bannedWords = ['the', 'you', 'new', 'js', 'html', 'cvm', 'knockout', 'plugin', 'self', 'all', 'tamu', 'newer', 'data', 'into', 'apps', 'script', 'setup', 'edu']
+bannedWords = readFile('banned-words.txt')
 
 filteredWords = Counter({key: wordCount[key] for key in wordCount if wordIsValid(key, rx, bannedWords)}).most_common(args.number)
 
